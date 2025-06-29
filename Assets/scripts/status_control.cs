@@ -37,7 +37,7 @@ namespace ROS2
 
         IEnumerator PeriodicAsyncCall(int state)
         {
-            while (ros2Unity.Ok())
+            if (ros2Unity.Ok())
             {
                 while (!StateClient.IsServiceAvailable())
                 {
