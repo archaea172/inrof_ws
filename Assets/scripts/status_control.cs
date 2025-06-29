@@ -10,7 +10,6 @@ namespace ROS2
     {
         private ROS2UnityComponent ros2Unity;
         private ROS2Node ros2Node;
-        private bool isRunning = false;
         private IClient<lifecycle_msgs.srv.ChangeState_Request, lifecycle_msgs.srv.ChangeState_Response> StateClient;
         private Task<lifecycle_msgs.srv.ChangeState_Response> asyncTask;
         // Start is called before the first frame update
@@ -22,6 +21,9 @@ namespace ROS2
                 if (ros2Node == null)
                 {
                     ros2Node = ros2Unity.CreateNode("status_controler");
+                    StateClient = ros2Node.CreateClient<lifecycle_msgs.srv.ChangeState_Request, lifecycle_msgs.srv.ChangeState_Response>(
+                        "state_control_service"
+                    );
                 }
             }
 
@@ -31,6 +33,25 @@ namespace ROS2
         void Update()
         {
 
+        }
+
+        private IEnumerator PeriodicAsyncCall(int state)
+        {
+            while (ros2Unity.Ok())
+            {
+                while (!StateClient.IsServiceAvailable())
+                {
+                    yield return new WaitForSecondsRealtime(1);
+                }
+
+                lifecycle_msgs.srv.ChangeState_Request request = new lifecycle_msgs.srv.ChangeState_Request();
+                request.Transition.Id = (byte)state;
+
+                asyncTask = StateClient.CallAsync(request);
+                asyncTask.ContinueWith((task) => { Debug.Log("Got async answer " + task.Result.Success); });
+            
+                yield return new WaitForSecondsRealtime(1);
+            }
         }
     }
 }
