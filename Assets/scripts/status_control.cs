@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using ROS2;
 
 namespace ROS2
 {
@@ -8,6 +10,9 @@ namespace ROS2
     {
         private ROS2UnityComponent ros2Unity;
         private ROS2Node ros2Node;
+        private bool isRunning = false;
+        private IClient<lifecycle_msgs.srv.ChangeState_Request, lifecycle_msgs.srv.ChangeState_Response> StateClient;
+        private Task<lifecycle_msgs.srv.ChangeState_Response> asyncTask;
         // Start is called before the first frame update
         void Start()
         {
