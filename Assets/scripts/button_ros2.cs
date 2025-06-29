@@ -14,7 +14,15 @@ namespace ROS2
         // Start is called before the first frame update
         void Start()
         {
-            
+            ros2Unity = GetComponent<ROS2UnityComponent>();
+            if (ros2Unity.Ok())
+            {
+                if (ros2Node == null)
+                {
+                    ros2Node = ros2Unity.CreateNode("ROS2UnityTalkerNode");
+                    string_pub = ros2Node.CreatePublisher<std_msgs.msg.String>("chatter");
+                }
+            }
         }
 
         // Update is called once per frame
@@ -25,14 +33,8 @@ namespace ROS2
 
         public void on_click()
         {
-            ros2Unity = GetComponent<ROS2UnityComponent>();
             if (ros2Unity.Ok())
             {
-                if (ros2Node == null)
-                {
-                    ros2Node = ros2Unity.CreateNode("ROS2UnityTalkerNode");
-                    string_pub = ros2Node.CreatePublisher<std_msgs.msg.String>("chatter");
-                }
 
                 std_msgs.msg.String msg = new std_msgs.msg.String();
                 msg.Data = "hellow world from button";
